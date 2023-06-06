@@ -1,0 +1,47 @@
+<!-- booklet.html -->
+
+<h1>{{ book.name }}</h1>
+
+<!-- Display book details -->
+<p>Category: {{ book.category }}</p>
+<p>Description: {{ book.description }}</p>
+<p>Rating: {{ book.rating }}</p>
+<p>Price: {{ book.price }}</p>
+
+<!-- Display comments -->
+<h2>Comments</h2>
+{% for comment in book.comments.all %}
+    <p>By {{ comment.buyer.username }} on {{ comment.created_at }}</p>
+    <p>{{ comment.content }}</p>
+    <p>Rating: {{ comment.rated }}</p>
+{% empty %}
+    <p>No comments yet.</p>
+{% endfor %}
+
+<!-- Comment form -->
+{% if request.user.is_authenticated %}
+    <h2>Add a Comment</h2>
+    <form method="POST" action="{% url 'booklet' book_id=book.id %}">
+        {% csrf_token %}
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content" required></textarea><br>
+        <label for="rated">Rating:</label><br>
+        <select id="rated" name="rated" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select><br>
+        <button type="submit">Submit</button>
+    </form>
+{% else %}
+    <p>Please <a href="{% url 'login' %}">login</a> to add a comment.</p>
+{% endif %}
+
+<!-- Buy button -->
+{% if request.user.is_authenticated %}
+    <a href="{% url 'buy_book' book_id=book.id %}">Buy Book</a>
+{% else %}
+    <p>Please <a href="{% url 'login' %}">login</a> to buy the book.</p>
+{% endif %}
